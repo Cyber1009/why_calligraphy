@@ -24,6 +24,7 @@ const baseBackgroundOptions = [
     { name: '原图', value: 'original', color: 'transparent', isOriginal: true },
     { name: '雪白', value: 'default', color: '#ffffff' },
     { name: '宣纸', value: 'rice', color: '#faf8f3' },
+    { name: '自定义', value: 'custom', color: '#f0f0f0', isCustom: true },
     // Commented out additional single color backgrounds
     // { name: 'Aged Parchment', value: 'parchment', color: '#f5f1e8' },
     // { name: 'Silk Scroll', value: 'silk', color: '#f7f3e9' },
@@ -33,6 +34,9 @@ const baseBackgroundOptions = [
 
 // Dynamic background options based on image aspect ratio
 let backgroundOptions = [...baseBackgroundOptions];
+
+// Store custom background image
+let customBackgroundImage = null;
 
 // Mobile detection function
 function isMobileDevice() {
@@ -79,6 +83,12 @@ function initializeApp() {
 function setupEventListeners() {
     // File input
     document.getElementById('imageInput').addEventListener('change', handleImageUpload);    
+    
+    // Custom background file input
+    const customBackgroundInput = document.getElementById('customBackgroundInput');
+    if (customBackgroundInput) {
+        customBackgroundInput.addEventListener('change', handleCustomBackgroundUpload);
+    }
     
     // Threshold slider with enhanced real-time performance
     const thresholdSlider = document.getElementById('thresholdSlider');
@@ -158,7 +168,7 @@ function discoverImageFiles(folderPath) {
         'background/paper/': ['卷轴.jpg', '宣纸2.jpg', '宣纸3.jpg', '宣纸4.jpg', '竹编.jpg'],
         'background/background_h/': ['水墨.jpg', '水墨2.jpg', '粉荷.jpg', '鲤鱼.jpg'], // Updated with actual files
         'background/background_v/': ['书卷.jpg', '水墨-竖.png', '水墨6.png'], // Updated with actual files
-        'app_background/': ['background_bamboo.jpg', 'background_bamboo_2.jpg', 'background_bamboo_3.jpg', 'background_bamboo_4.jpg']
+        'app_background/': ['background_bamboo.jpg', 'background_bamboo_2.jpg', 'background_bamboo_3.jpg', 'background_bamboo_4.jpg', 'boat.jpeg']
     };
     
     return Promise.resolve(knownImagesByFolder[folderPath] || []);
@@ -277,6 +287,12 @@ async function populateBackgroundOptions(aspectRatio = null) {
             preview.style.backgroundSize = '8px 8px';
             preview.style.backgroundPosition = '0 0, 0 4px, 4px -4px, -4px 0px';
             preview.innerHTML = '<div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #666;">📷</div>';
+        } else if (bg.isCustom) {
+            // Special styling for custom background upload option
+            preview.style.background = 'linear-gradient(135deg, #e8dcc0 0%, #f0e8d8 100%)';
+            preview.style.border = '2px dashed #8b7753';
+            preview.style.cursor = 'pointer';
+            preview.innerHTML = '<div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #666;">+</div>';
         } else if (bg.imagePath) {
             // Custom background image
             const img = document.createElement('img');
@@ -300,6 +316,16 @@ async function populateBackgroundOptions(aspectRatio = null) {
         
         option.appendChild(preview);
         option.appendChild(label);
+        
+        // Add special click handler for custom background option
+        if (bg.isCustom) {
+            option.style.cursor = 'pointer';
+            option.addEventListener('click', function(e) {
+                e.stopPropagation();
+                document.getElementById('customBackgroundInput').click();
+            });
+        }
+        
         container.appendChild(option);
     });
 }
@@ -319,6 +345,11 @@ function selectBackground(option) {
         if (selectedBackground === 'original') {
             // Show original image preview
             displayOriginalImage();
+        } else if (selectedBackground === 'custom') {
+            // Custom background - wait for image to be loaded via file input
+            if (customBackgroundImage) {
+                processImageRealtime();
+            }
         } else {
             // Process image with selected background
             processImageRealtime(); // Lightweight real-time updates
@@ -351,6 +382,59 @@ function handleImageUpload(event) {
             }
         };
         img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+}
+
+/**
+ * Handle custom background image upload
+ * Allows users to upload their own background image
+ * Auto-resizes to fit the calligraphy dimensions
+ */
+function handleCustomBackgroundUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    // Validate file type
+    const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+        showError('Please select a valid image file (PNG, JPG, JPEG, GIF, WebP)');
+        return;
+    }
+    
+    // Validate file size (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+        showError('Image file is too large. Please choose a file under 10MB.');
+        return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+            // Store the custom background image
+            customBackgroundImage = img;
+            
+            // Select custom background option
+            const customOption = document.querySelector('.background-option[data-bg="custom"]');
+            if (customOption) {
+                selectBackground(customOption);
+            }
+            
+            hideError();
+            
+            // Process the image with the new custom background
+            if (currentImage) {
+                processImageRealtime();
+            }
+        };
+        img.onerror = function() {
+            showError('Failed to load the background image. Please try another file.');
+        };
+        img.src = e.target.result;
+    };
+    reader.onerror = function() {
+        showError('Error reading the background image file.');
     };
     reader.readAsDataURL(file);
 }
@@ -648,6 +732,18 @@ function createBackgroundImage(width, height) {
     // Handle original option - return original image as background
     if (selectedBackground === 'original') {
         ctx.drawImage(currentImage, 0, 0, width, height);
+        return canvas;
+    }
+    
+    // Handle custom uploaded background
+    if (selectedBackground === 'custom') {
+        if (customBackgroundImage) {
+            ctx.drawImage(customBackgroundImage, 0, 0, width, height);
+        } else {
+            // Fallback to white if custom image not loaded
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, width, height);
+        }
         return canvas;
     }
     
@@ -1585,7 +1681,8 @@ function preloadAllBackgroundImages() {
         'background/background_h/鲤鱼.jpg',
         'background/background_h/粉荷.jpg',
         'background/background_h/水墨2.jpg',
-        'background/background_h/水墨.jpg'
+        'background/background_h/水墨.jpg',
+        'app_background/boat.jpeg'
     ];
     imagePaths.forEach(path => {
         const img = new Image();
