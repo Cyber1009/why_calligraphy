@@ -413,13 +413,14 @@
             position: relative;
         }        /* Header with traditional Chinese styling */
         .header {
-            text-align: center;
+            text-align: left;
             margin-bottom: 1.5rem;
             position: relative;
             display: flex;
             align-items: center;
             justify-content: flex-start;
             padding-left: 2rem; /* Push teapot and title towards right */
+            gap: 0.5rem; /* Add gap between teapot and title */
             min-height: 120px; /* Fixed height to prevent layout shifts */
             max-height: 120px; /* Constrain height */
         }        .main-title {
@@ -1016,18 +1017,22 @@
                 padding: 1rem;
             }            
             .header {
-                padding-left: 1.5rem; /* Maintain right positioning on mobile */
+                padding-left: 1rem;
+                gap: 0.75rem; /* Increase gap slightly for mobile */
+                min-height: 80px;
+                max-height: 80px;
             }              .teapot-container {
-                width: 75px; /* Much smaller to prevent title conflicts in F12 mobile mode */
-                height: 75px;
-                top: 5px; /* Align better with title baseline */
-                left: 5px; /* Move further left */
+                width: 70px;
+                height: 70px;
+                margin-left: 0;
+                margin-right: 0;
             }
             
             .main-title {
-                font-size: 2.2rem;
-                line-height: 1.2;
-                margin-bottom: 1.5rem;
+                font-size: 2rem;
+                line-height: 1.1;
+                margin-bottom: 0;
+                margin-top: 0;
             }
             
             .subtitle {
@@ -1077,17 +1082,21 @@
             .main-container {
                 padding: 0.5rem;
             }              .header {
-                padding-left: 1rem; /* Maintain right positioning on smaller mobile */
+                padding-left: 0.5rem;
+                gap: 0.5rem;
+                min-height: 65px;
+                max-height: 65px;
             }            .teapot-container {
-                width: 65px; /* Even smaller for 480px screens */
-                height: 65px;
-                top: 3px; /* Align better with title baseline */
-                left: 3px; /* Move further left */
+                width: 55px;
+                height: 55px;
+                margin-left: 0;
+                margin-right: 0;
             }
             
             .main-title {
-                font-size: 1.8rem;
-                margin-bottom: 1rem;
+                font-size: 1.6rem;
+                margin-bottom: 0;
+                margin-top: 0;
             }
             
             .panel-body {
@@ -1386,7 +1395,7 @@
                             <div class="upload-icon-wrapper">
                                 <input type="file" class="file-input" id="imageInput" accept="image/*">
                                 <label for="imageInput" class="upload-icon-button upload-icon-compact" title="Upload calligraphy image">
-                                    <img src="app_background/writing_brush.png?v=20250101" alt="Upload" style="width: 120px; height: 120px; filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));">
+                                    <img src="app_background/writing_brush.png?v=20260306" alt="Upload" style="width: 120px; height: 120px; filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));">
                                 </label>
                                 <!-- Hidden input for custom background upload -->
                                 <input type="file" class="file-input" id="customBackgroundInput" accept="image/*">

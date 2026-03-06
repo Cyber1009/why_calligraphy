@@ -21,10 +21,10 @@ let isTeaPouring = false; // Track teapot pouring state
 
 // Background options - Traditional Chinese calligraphy inspired
 const baseBackgroundOptions = [
+    { name: '自定义', value: 'custom', color: '#f0f0f0', isCustom: true },
     { name: '原图', value: 'original', color: 'transparent', isOriginal: true },
     { name: '雪白', value: 'default', color: '#ffffff' },
     { name: '宣纸', value: 'rice', color: '#faf8f3' },
-    { name: '自定义', value: 'custom', color: '#f0f0f0', isCustom: true },
     // Commented out additional single color backgrounds
     // { name: 'Aged Parchment', value: 'parchment', color: '#f5f1e8' },
     // { name: 'Silk Scroll', value: 'silk', color: '#f7f3e9' },
@@ -168,7 +168,7 @@ function discoverImageFiles(folderPath) {
         'background/paper/': ['卷轴.jpg', '宣纸2.jpg', '宣纸3.jpg', '宣纸4.jpg', '竹编.jpg'],
         'background/background_h/': ['水墨.jpg', '水墨2.jpg', '粉荷.jpg', '鲤鱼.jpg'], // Updated with actual files
         'background/background_v/': ['书卷.jpg', '水墨-竖.png', '水墨6.png'], // Updated with actual files
-        'app_background/': ['background_bamboo.jpg', 'background_bamboo_2.jpg', 'background_bamboo_3.jpg', 'background_bamboo_4.jpg', 'boat.jpeg']
+        'app_background/': ['翠竹.jpg', '竹影.jpg', '竹韵.jpg', '竹林.jpg']
     };
     
     return Promise.resolve(knownImagesByFolder[folderPath] || []);
